@@ -32,8 +32,6 @@ class TLC5951
 		byte _brightBlue;
 		byte _dcData[8][3];
 		
-		bool _buffer[288];
-		
 		// [0-7 LED][0-2 RGB]
 		unsigned int _gsData[8][3];
 };
