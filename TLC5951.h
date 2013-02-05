@@ -2,40 +2,39 @@
 #define tcl5951_h
 
 #include "Arduino.h"
+#include "SPI.h"
 
 class TLC5951
 {
 	public:
-		void init(int gssin, int gssck, int gslat, int xblnk, int gsckrgb);
-		void init(int gssin, int gssck, int gslat, int xblnk, int gsckrgb, int grayscale);
-		void setAllGSData(int gsvalue);
+		void init(uint8_t gslat, uint8_t xblnk);
+		void init(uint8_t gslat, uint8_t xblnk, uint16_t grayscale);
+		void setAllGSData(uint16_t gsvalue);
 		void updateGS();
-		void setLED(unsigned int led, unsigned int red, unsigned int green, unsigned int blue);
-		void setFunctionData(byte data);
-		void setBrightness(byte red, byte green, byte blue);
-		void setAllDCData(int dcvalue);
+		void setLED(uint8_t led, uint16_t red, uint16_t green, uint16_t blue);
+		void setFunctionData(uint8_t data);
+		void setBrightness(uint8_t red, uint8_t green, uint8_t blue);
+		void setAllDCData(uint8_t dcvalue);
 		void updateControl();
 		void update();
+		void setBuffer(uint8_t bit);
 	
 	private:
-		int _gssin;
-		int _gssck;
-		int _gslat;
-		int _xblnk;
-		int _gsckrgb;
-		int _dcsin;
-		int _dcsck;
+		uint8_t _gslat;
+		uint8_t _xblnk;
 		
-		byte _functionData;
-		byte _brightRed;
-		byte _brightGreen;
-		byte _brightBlue;
-		byte _dcData[8][3];
-		
-		bool _buffer[288];
+		uint8_t _functionData;
+		uint8_t _brightRed;
+		uint8_t _brightGreen;
+		uint8_t _brightBlue;
+		uint8_t _dcData[8][3];
 		
 		// [0-7 LED][0-2 RGB]
-		unsigned int _gsData[8][3];
+		uint16_t _gsData[8][3];
+		
+		// SPI
+		uint8_t _buffer;
+		uint8_t _bufferCount;
 };
 
 #endif
