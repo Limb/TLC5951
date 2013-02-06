@@ -1,5 +1,5 @@
-#ifndef tlc5951_h
-#define tcl5951_h
+#ifndef TLC5951_h
+#define TLC5951_h
 
 #include "Arduino.h"
 #include "SPI.h"
