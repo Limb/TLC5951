@@ -150,5 +150,6 @@ void TLC5951::setBuffer(uint8_t bit){
 	    SPI.setBitOrder(LSBFIRST);
 		SPI.transfer(_buffer);
 		_bufferCount = 0;
+		_buffer = 0;
 	}
 }
