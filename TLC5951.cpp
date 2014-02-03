@@ -44,7 +44,7 @@ void TLC5951::setAllGSData(uint16_t gsvalue) {
 void TLC5951::updateGS() {
 	_bufferCount = 0;
 	
-	//digitalWrite(_xblnk, LOW); // Turn off the LED's since we're clocking in data
+	digitalWrite(_xblnk, LOW); // Turn off the LED's since we're clocking in data
 	digitalWrite(_gslat, LOW); // GS Latch low, so it goes into the GS data latch
 	
 	for(int8_t a = 7; a >= 0; a--) { // We have 8 LED's. Start at the last since thats how we clock data out
@@ -60,7 +60,7 @@ void TLC5951::updateGS() {
 	digitalWrite(_gslat, HIGH);
 	digitalWrite(_gslat, LOW);
 	
-	//digitalWrite(_xblnk, HIGH);
+	digitalWrite(_xblnk, HIGH);
 }
 
 void TLC5951::setLED(uint8_t led, uint16_t red, uint16_t green, uint16_t blue) {
@@ -91,7 +91,7 @@ void TLC5951::setAllDCData(uint8_t dcvalue) {
 void TLC5951::updateControl() {
 	_bufferCount = 0;
 	
-	//digitalWrite(_xblnk, LOW);
+	digitalWrite(_xblnk, LOW);
 	digitalWrite(_gslat, HIGH);	
 		
 	// 89 blank bits to get to correct position for DC/DC/FC (Disregard UD) data
@@ -134,7 +134,7 @@ void TLC5951::updateControl() {
 	digitalWrite(_gslat, HIGH);
 	digitalWrite(_gslat, LOW);
 	
-	//digitalWrite(_xblnk, HIGH);		
+	digitalWrite(_xblnk, HIGH);		
 }
 
 void TLC5951::update() {
