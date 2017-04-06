@@ -18,6 +18,7 @@ class TLC5951
 		void updateControl();
 		void update();
 		void setBuffer(uint8_t bit);
+		void shiftLED(uint16_t red, uint16_t green, uint16_t blue);
 	
 	private:
 		uint8_t _gslat;
@@ -29,8 +30,8 @@ class TLC5951
 		uint8_t _brightBlue;
 		uint8_t _dcData[8][3];
 		
-		// [0-7 LED][0-2 RGB]
-		uint16_t _gsData[8][3];
+		// [0-1 TLC5951's][0-7 LED][0-2 RGB]
+		uint16_t _gsData[2][8][3];
 		
 		// SPI
 		uint8_t _buffer;

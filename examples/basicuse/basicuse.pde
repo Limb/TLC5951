@@ -66,30 +66,40 @@ void loop() {
   // The follow code will cycle through a range of rainbow colors to demonstrate the functionality.
   // Code was adapted from https://gist.github.com/jamesotron/766994
 
-  unsigned int rgbColour[3];
+  // unsigned int rgbColour[3];
 
-  // Start off with red.
-  rgbColour[0] = 255;
-  rgbColour[1] = 0;
-  rgbColour[2] = 0;  
+  // // Start off with red.
+  // rgbColour[0] = 255;
+  // rgbColour[1] = 0;
+  // rgbColour[2] = 0;  
 
-  // Choose the colours to increment and decrement.
-  for (int decColour = 0; decColour < 3; decColour += 1) {
-    int incColour = decColour == 2 ? 0 : decColour + 1;
+  // // Choose the colours to increment and decrement.
+  // for (int decColour = 0; decColour < 3; decColour += 1) {
+  //   int incColour = decColour == 2 ? 0 : decColour + 1;
 
-    // cross-fade the two colours.
-    for(int i = 0; i < 255; i += 1) {
-      rgbColour[decColour] -= 1;
-      rgbColour[incColour] += 1;
+  //   // cross-fade the two colours.
+  //   for(int i = 0; i < 51; i += 1) {
+  //     rgbColour[decColour] -= 5;
+  //     rgbColour[incColour] += 5;
       
-   for(int a = 0; a < 7; a++)
-      {
-        tlc.setLED(a, rgbColour[0], rgbColour[1], rgbColour[2]);
-      }
-      tlc.updateGS();
-    delay(10);
-    }
-  }
+  //  for(int a = 0; a < 7; a++)
+  //     {
+  //       tlc.shiftLED(rgbColour[0], rgbColour[1], rgbColour[2]);
+  //     }
+  //     tlc.updateGS();
+  //   delay(100);
+  //   }
+  // }
+
+  tlc.shiftLED(4095, 0, 0);
+  tlc.updateGS();
+  delay(500);
+  tlc.shiftLED(0, 4095, 0);
+  tlc.updateGS();
+  delay(500);
+  tlc.shiftLED(0,0,4095);
+  tlc.updateGS();
+  delay(500);
 }                  
   
   

@@ -36,7 +36,7 @@ void TLC5951::init(uint8_t gslat, uint8_t xblnk, uint16_t grayscale) {
 void TLC5951::setAllGSData(uint16_t gsvalue) {
 	for(int8_t a = 0; a < 8; a++) {
 		for(int8_t b = 0; b < 3; b++) {
-			_gsData[a][b] = gsvalue;
+			_gsData[0][a][b] = gsvalue;
 		}
 	}
 }
@@ -47,10 +47,13 @@ void TLC5951::updateGS() {
 	digitalWrite(_xblnk, LOW); // Turn off the LED's since we're clocking in data
 	digitalWrite(_gslat, LOW); // GS Latch low, so it goes into the GS data latch
 	
-	for(int8_t a = 7; a >= 0; a--) { // We have 8 LED's. Start at the last since thats how we clock data out
-		for(int8_t b = 2; b >= 0; b--) { // Each with 3 colors
-			for(int8_t c = 11; c >= 0; c--) { // each consiting of 12 bits
-				setBuffer((_gsData[a][b] & (1<<c)));
+	for(int8_t i = 0; i < 2; i++)
+	{
+		for(int8_t a = 7; a >= 0; a--) { // We have 8 LED's. Start at the last since thats how we clock data out
+			for(int8_t b = 2; b >= 0; b--) { // Each with 3 colors
+				for(int8_t c = 11; c >= 0; c--) { // each consiting of 12 bits
+					setBuffer((_gsData[0][a][b] & (1<<c)));
+				}
 			}
 		}
 	}
@@ -64,9 +67,9 @@ void TLC5951::updateGS() {
 }
 
 void TLC5951::setLED(uint8_t led, uint16_t red, uint16_t green, uint16_t blue) {
-	_gsData[led][2] = blue;
-	_gsData[led][1] = green;
-	_gsData[led][0] = red;
+	_gsData[0][led][2] = blue;
+	_gsData[0][led][1] = green;
+	_gsData[0][led][0] = red;
 }
 
 void TLC5951::setFunctionData(uint8_t data) {
@@ -93,37 +96,39 @@ void TLC5951::updateControl() {
 	
 	digitalWrite(_xblnk, LOW);
 	digitalWrite(_gslat, HIGH);	
+	for(int8_t i = 0; i < 2; i++)
+	{
+		// 89 blank bits to get to correct position for DC/DC/FC (Disregard UD) data
+		for(int8_t a = 0; a < 89; a++) {
+			setBuffer(0);
+		}
 		
-	// 89 blank bits to get to correct position for DC/DC/FC (Disregard UD) data
-	for(int8_t a = 0; a < 89; a++) {
-		setBuffer(0);
-	}
-	
-	// 7-bit Function Data
-	for(int8_t a = 6; a >= 0; a--) {
-		setBuffer((_functionData & (1<<a)));
-	}
-	
-	// Blue Brightness
-	for(int8_t a = 7; a >= 0; a--) {
-		setBuffer((_brightBlue & (1<<a)));
-	}
-	
-	// Green Brightness
-	for(int8_t a = 7; a >= 0; a--) {
-		setBuffer((_brightGreen & (1<<a)));
-	}
-	
-	// Red Brightness
-	for(int8_t a = 7; a >= 0; a--) {
-		setBuffer((_brightRed & (1<<a)));
-	}
-	
-	// Dot Correctness data
-	for(int8_t a = 7; a >= 0; a--) {
-		for(int8_t b = 2; b >= 0; b--) {
-			for(int8_t c = 6; c >= 0; c--) {
-				setBuffer(_dcData[a][b] & (1<<c));
+		// 7-bit Function Data
+		for(int8_t a = 6; a >= 0; a--) {
+			setBuffer((_functionData & (1<<a)));
+		}
+		
+		// Blue Brightness
+		for(int8_t a = 7; a >= 0; a--) {
+			setBuffer((_brightBlue & (1<<a)));
+		}
+		
+		// Green Brightness
+		for(int8_t a = 7; a >= 0; a--) {
+			setBuffer((_brightGreen & (1<<a)));
+		}
+		
+		// Red Brightness
+		for(int8_t a = 7; a >= 0; a--) {
+			setBuffer((_brightRed & (1<<a)));
+		}
+		
+		// Dot Correctness data
+		for(int8_t a = 7; a >= 0; a--) {
+			for(int8_t b = 2; b >= 0; b--) {
+				for(int8_t c = 6; c >= 0; c--) {
+					setBuffer(_dcData[a][b] & (1<<c));
+				}
 			}
 		}
 	}
@@ -142,7 +147,7 @@ void TLC5951::update() {
 	updateGS();
 }
 
-void TLC5951::setBuffer(uint8_t bit){
+void TLC5951::setBuffer(uint8_t bit) {
 	bitWrite(_buffer, _bufferCount, bit);
 	_bufferCount++;
 	if(_bufferCount == 8)
@@ -151,5 +156,26 @@ void TLC5951::setBuffer(uint8_t bit){
 		SPI.transfer(_buffer);
 		_bufferCount = 0;
 		_buffer = 0;
+	}
+}
+
+void TLC5951::shiftLED(uint16_t red, uint16_t green, uint16_t blue) {
+	_gsData[0][1][2] = _gsData[0][0][2];
+	_gsData[0][1][1] = _gsData[0][0][1];
+	_gsData[0][1][0] = _gsData[0][0][0];
+
+	_gsData[0][0][2] = blue;
+	_gsData[0][0][1] = green;
+	_gsData[0][0][0] = red;
+
+	for(uint8_t a = 0; a < 2; a++) {
+		for(uint8_t b = 0; b < 7; b++) {
+			// skip first one, its taken care of.
+			if(a == 0 && b == 0) continue;
+
+				_gsData[a][b+1][2] = _gsData[a][b][2];
+				_gsData[a][b+1][1] = _gsData[a][b][1];
+				_gsData[a][b+1][0] = _gsData[a][b][0];
+		}
 	}
 }
